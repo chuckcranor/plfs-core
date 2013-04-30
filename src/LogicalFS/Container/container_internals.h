@@ -6,12 +6,8 @@ int container_access( const char *path, int mask );
 
 int container_chmod( const char *path, mode_t mode );
 
-int container_chown( const char *path, uid_t, gid_t );
-
 int container_close(Container_OpenFile *,pid_t,uid_t,int open_flags,
                     Plfs_close_opt *close_opt);
-
-int container_create( const char *path, mode_t mode, int flags, pid_t pid );
 
 int container_dump_index( FILE *fp, const char *path, 
                     int compress, int uniform_restart, pid_t uniform_rank );

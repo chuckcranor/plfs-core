@@ -77,6 +77,8 @@ class Container
 
         static bool isContainer(const struct plfs_pathback *physical_path,
                                 mode_t *);
+        static int findContainerPaths(const string& logical,
+                                      ContainerPaths& paths);
         static string getIndexPath( const string&, const string&,
                                     int pid,double);
         static string getDataPath(  const string&, const string&,

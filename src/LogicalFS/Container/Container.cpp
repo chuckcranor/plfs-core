@@ -1076,6 +1076,35 @@ Container::getIndexHostPath(const string& path,const string& host,
     return oss.str();
 }
 
+// this is a helper routine that takes a logical path and figures out a
+// bunch of derived paths from it
+int
+Container::findContainerPaths(const string& logical, ContainerPaths& paths)
+{
+    ExpansionInfo exp_info;
+    char *hostname = Util::hostname();
+    // set up our paths.  expansion errors shouldn't happen but check anyway
+    // set up shadow first
+    paths.shadow = expandPath(logical,&exp_info,EXPAND_SHADOW,-1,0);
+    if (exp_info.Errno) {
+        return (exp_info.Errno);
+    }
+    paths.shadow_hostdir = Container::getHostDirPath(paths.shadow,hostname,
+                           PERM_SUBDIR);
+    paths.hostdir=paths.shadow_hostdir.substr(paths.shadow.size(),string::npos);
+    paths.shadow_backend = get_backend(exp_info);
+    paths.shadowback = exp_info.backend;
+    // now set up canonical
+    paths.canonical = expandPath(logical,&exp_info,EXPAND_CANONICAL,-1,0);
+    if (exp_info.Errno) {
+        return (exp_info.Errno);
+    }
+    paths.canonical_backend = get_backend(exp_info);
+    paths.canonical_hostdir=Container::getHostDirPath(paths.canonical,hostname,
+                            PERM_SUBDIR);
+    paths.canonicalback = exp_info.backend;
+    return 0;  // no expansion errors.  All paths derived and returned
+}
 string
 Container::getIndexPath(const string& path, const string& host, int pid,
                         double ts)
