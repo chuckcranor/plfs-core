@@ -545,7 +545,16 @@ Container_fd::trunc(const char *path, off_t offset)
     return container_trunc(fd, path, offset, open_file);
 }
 
-/* XXXCDC: put lazy stat comment here */
+// there's a lazy stat flag, sz_only, which means all the caller cares
+// about is the size of the file.  If the file is currently
+// open (i.e. we have a wf ptr, then the size info is stashed in
+// there.  It might not be fully accurate since it just contains info
+// for the writes of the current proc but it's a good-enough estimate
+// however, if the caller hasn't passed lazy or if the wf isn't
+// available then we need to do a more expensive descent into
+// the container.  This descent is especially expensive for an open
+// file where we can't just used the cached meta info but have to
+// actually fully populate an index structure and query it
 int
 Container_fd::getattr(const char *unusedpath, struct stat *stbuf, int sz_only)
 {
