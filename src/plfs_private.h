@@ -96,6 +96,25 @@ typedef struct {
     struct plfs_backend *backend;
 } ExpansionInfo;
 
+/**
+ * plfs_pathinfo: the upper-level PLFS code uses this structure to cache
+ * the results of translating a logical path into a physical path (e.g.
+ * through the mount table in the PlfsConf).   we do one translation at
+ * the beginning of the operation and never have to do it again (old code
+ * used to pass around the logical path and repeatedly resolve it).
+ */
+struct plfs_physpathinfo {
+
+    /* these fields are set by generic plfs_resolvepath() code */
+    string bnode;         /* logical path with the mountpoint removed */
+    const char *filename; /* points to last part of the bnode */
+    PlfsMount *mnt_pt;    /* mount point, includes ptr to our logical fs */
+
+    /* these fields are set and used by the logical fs (only) */
+    struct plfs_backend *canback;   /* canonical backend */
+    string canbpath;                /* path on canonical backend */
+};
+
 #define PLFS_ENTER PLFS_ENTER2(PLFS_PATH_REQUIRED)
 
 #define PLFS_ENTER2(X) \
@@ -158,6 +177,8 @@ PlfsConf *parse_conf(FILE *fp, string file, PlfsConf *pconf);
 */
 PlfsConf *get_plfs_conf( );
 
+int find_best_mount_point(const char *cleanlogical, PlfsMount **mpp,
+                          int *mlen);
 PlfsMount *find_mount_point(PlfsConf *pconf, const string& path, bool& found);
 PlfsMount *find_mount_point_using_tokens(PlfsConf *, vector <string> &, bool&);
 int find_all_expansions(const char *logical,vector<plfs_pathback> &containers);
@@ -173,6 +194,7 @@ int mkdir_dash_p(const string& path, bool parent_only, IOStore *);
 int recover_directory(const char *logical, bool parent_only);
 
 int plfs_iterate_backends(const char *logical, FileOp& op);
+int plfs_resolvepath(const char *logical, struct plfs_physpathinfo *ppip);
 
 const string& get_backend(const ExpansionInfo& exp);
 const string& get_backend(const ExpansionInfo& exp, size_t which);
