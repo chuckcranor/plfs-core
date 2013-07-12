@@ -27,7 +27,7 @@ class Small_fd : public Plfs_fd, public PLFSIndex
         ssize_t write(const char *buf, size_t size, off_t offset, pid_t pid);
         int sync();
         int sync(pid_t pid);
-        int trunc(off_t offset);
+        int trunc(off_t offset, struct plfs_physpathinfo *ppip);
         int getattr(struct stat *stbuf, int sz_only);
         int query(size_t *writers, size_t *readers, size_t *bytes_written,
                   bool *reopen);

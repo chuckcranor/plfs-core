@@ -9,7 +9,7 @@ Small_fd::open(struct plfs_physpathinfo * /* ppip */, int flags, pid_t pid,
     refs++;
     open_flags = flags & 0xf;
     open_by_pid = pid;
-    if (flags & O_TRUNC) trunc(0);
+    if (flags & O_TRUNC) trunc(0, NULL);
     return 0;
 }
 
@@ -76,7 +76,7 @@ Small_fd::sync(pid_t /* pid */)
 }
 
 int
-Small_fd::trunc(off_t offset)
+Small_fd::trunc(off_t offset, struct plfs_physpathinfo *ppip)
 {
     int ret;
     if (open_flags == O_WRONLY || open_flags == O_RDWR) {

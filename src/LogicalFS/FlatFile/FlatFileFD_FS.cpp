@@ -133,7 +133,7 @@ Flat_fd::sync(pid_t /* pid */)
 
 /* ret 0 or -err */
 int
-Flat_fd::trunc(off_t offset)
+Flat_fd::trunc(off_t offset, struct plfs_physpathinfo *ppip)
 {
     int ret = this->backend_fh->Ftruncate(offset);
     return(ret);
